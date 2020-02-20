@@ -167,6 +167,7 @@
 				mat4.rotate(m, m, Radians(45), z_axis); //rotate m by 45 degrees around teh z axis and put result back in my m is input and output and is counter clock wise
 				//This stamps your four vertices for you square on the plane
 				
+				quad.colors = [];
 				quad.indices = [];
 				let indicesCount = 0;
 				for (let i = 0; i < 360; i++) 
@@ -178,7 +179,31 @@
 					indicesCount++;
 
 
-					vec3.transformMat4(p, vec3.fromValues(.2, 0, 1), m);
+					vec3.transformMat4(p, vec3.fromValues(.4, 0, 0), m);
+					quad.vrts.push(p[0], p[1], p[2]);
+					quad.indices.push(indicesCount);
+					indicesCount++;
+
+					vec3.transformMat4(p, vec3.fromValues(1, 0, 0), m);
+					quad.vrts.push(p[0], p[1], p[2]);
+					quad.indices.push(indicesCount);
+					indicesCount++;
+				}
+
+				//*************************************************************************
+				//This part is for the inner circle!
+				//**************************************************************************
+
+				for (let i = 0; i < 360; i++) 
+				{
+					mat4.rotate(m, m, Radians(1), z_axis); 
+					vec3.transformMat4(p, vec3.fromValues(.4 * Math.cos(Radians(1)), .4 * Math.sin(Radians(1)), 0), m);
+					quad.vrts.push(p[0], p[1], p[2]);
+					quad.indices.push(indicesCount);
+					indicesCount++;
+
+
+					vec3.transformMat4(p, vec3.fromValues(.4, 0, 0), m);
 					quad.vrts.push(p[0], p[1], p[2]);
 					quad.indices.push(indicesCount);
 					indicesCount++;
@@ -257,7 +282,7 @@
 				gl.uniformMatrix4fv(color_shader.u_pj, false, P);
 				gl.bindVertexArray(quad.vao);
 				//This part needs to be 9 for 3 triangles
-				gl.drawElements(gl.TRIANGLES, 3 * 360, gl.UNSIGNED_SHORT, 0); 
+				gl.drawElements(gl.TRIANGLES, 3 * 360 * 2, gl.UNSIGNED_SHORT, 0); 
 				gl.bindVertexArray(axes.vao);
 				gl.drawElements(gl.LINES, 6, gl.UNSIGNED_SHORT, 0);
 				gl.bindVertexArray(null);
