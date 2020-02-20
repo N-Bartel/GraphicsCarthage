@@ -169,27 +169,28 @@
 				
 				quad.indices = [];
 				let indicesCount = 0;
-				for (let i = 0; i < 6; i++) 
+				for (let i = 0; i < 360; i++) 
 				{
-					mat4.rotate(m, m, Radians(60), z_axis); 
-					vec3.transformMat4(p, vec3.fromValues(0.5, .1, 0), m);
+					mat4.rotate(m, m, Radians(1), z_axis); 
+					vec3.transformMat4(p, vec3.fromValues(Math.cos(Radians(1)), Math.sin(Radians(1)), 0), m);
 					quad.vrts.push(p[0], p[1], p[2]);
 					quad.indices.push(indicesCount);
 					indicesCount++;
 
-					vec3.transformMat4(p, vec3.fromValues(0.2, 0, 0), m);
+
+					vec3.transformMat4(p, vec3.fromValues(.2, 0, 1), m);
 					quad.vrts.push(p[0], p[1], p[2]);
 					quad.indices.push(indicesCount);
 					indicesCount++;
 
-					vec3.transformMat4(p, vec3.fromValues(0.5, -.1, 0), m);
+					vec3.transformMat4(p, vec3.fromValues(1, 0, 0), m);
 					quad.vrts.push(p[0], p[1], p[2]);
 					quad.indices.push(indicesCount);
 					indicesCount++;
 				}
 				
 				console.log(quad.vrts);
-				quad.colors = [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1 ];
+				//quad.colors = [ 1, 0, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1 ];
 				//quad.indices = [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17];
 
 				gl.bindVertexArray(quad.vao);
@@ -256,7 +257,7 @@
 				gl.uniformMatrix4fv(color_shader.u_pj, false, P);
 				gl.bindVertexArray(quad.vao);
 				//This part needs to be 9 for 3 triangles
-				gl.drawElements(gl.TRIANGLES, 18, gl.UNSIGNED_SHORT, 0); 
+				gl.drawElements(gl.TRIANGLES, 3 * 360, gl.UNSIGNED_SHORT, 0); 
 				gl.bindVertexArray(axes.vao);
 				gl.drawElements(gl.LINES, 6, gl.UNSIGNED_SHORT, 0);
 				gl.bindVertexArray(null);
