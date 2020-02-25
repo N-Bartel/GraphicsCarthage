@@ -1,0 +1,172 @@
+<html>
+	<head>
+		<meta charset="UTF-8">
+	</head>
+	<body style="background-color: #404040;">
+		<!--	Fairly minimalist demonstration of the roles of M, V and P.
+				Perry Kivolowitz - Carthage College Computer Science Department
+		-->
+		<script src="./gl-matrix-min.js"></script>
+		<script src="./shader_sources.js"></script>
+		<script src="./shader_support.js"></script>
+		<script src="./axes.js"></script>
+		<script src="./utilities.js"></script>
+		<script src="./disc.js"></script>
+		<div style="position: relative;">
+			<canvas id="txcanvas" width="1280" height="768" style="position: absolute; left: 0; top: 0; z-index: 1;"></canvas>
+			<canvas id="glcanvas" width="1280" height="768" style="position: absolute; left: 0; top: 0; z-index: 0;"></canvas>
+		</div>
+		<script>
+			/*	Enabling strict javascript means fewer silent errors.
+			*/
+			
+			'use strict';
+
+			function DrawScene(now) {
+
+                now /= 1000;
+				// This clears the HTML text. Try commenting this out.
+				ct.clearRect(0, 0, ct.canvas.width, ct.canvas.height);
+				// The next three  lines  erase  the  GL context, setting it to the
+				// 'clearColor'. The depth buffer is also cleared to enable drawing
+				// a fresh scene.
+				// The 'viewport'  call  establishes  the  mapping  from normalized
+				// device coordinates to window coordinates.
+				gl.clearColor(0.1, 0.1, 0.1, 1.0);
+				gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+				gl.viewport(0, 0, glcanvas.clientWidth, glcanvas.clientHeight);
+				// The "depth test" is  required  to enable display of only what is
+				// in "front".
+				gl.enable(gl.DEPTH_TEST);
+				let P = mat4.create();
+				let V = mat4.create();
+				let M = mat4.create();
+				let MVP = mat4.create();
+
+				mat4.perspective(P, Radians(40.0), glcanvas.clientWidth / glcanvas.clientHeight, near_plane, far_plane);
+				mat4.lookAt(V, vec3.fromValues(5, 5, 5), vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
+				// NOTE: This is NOT 15 RPM - you still have to figure that out.-
+                //let theta = Radians(now * 1.5707963249999999 * 60 * 38/40);
+                //let theta = Radians(now * 2*Math.PI * 15/60 * 60 * 38/40);
+                //the speed is now (s) * 2pi (rad) / 4 (s)
+                let theta = now * Math.PI / 2;
+                console.log(now);
+				mat4.rotate(M, M, theta, y_axis);
+				mat4.multiply(MVP, V, M);
+				mat4.multiply(MVP, P, MVP);
+				// M, V, and P are not longer being passed down separately but are precompounded here.
+				// More exotic shaders will need the individual matrices again in the future. 
+				disc.Draw(['wireframe'], MVP, [1, 1, 1, 1]);
+				if (display_normals)
+					disc.DrawNormals(MVP, [1, 0.15, 0.15, 1]);
+				if (number_vertices)
+					NumberVertices(MVP, disc.vrts, ct);
+				if (draw_solid)
+					disc.DrawSolid(MVP, [0.2, 0.4, 0.9, 1]);
+
+				requestAnimationFrame(DrawScene);
+			}
+
+			function InitCT() {
+				ct.textAlign = "left";
+				ct.textBaseline = "bottom";
+				ct.clearRect(0, 0, ct.canvas.width, ct.canvas.height);
+				ct.font = "16px Helvetica";
+				ct.fillStyle = "#F0F0F0";
+			}
+
+			/*	NumberVertices()
+			*	"I try to number those who love me
+			*    And find exactly what the trouble is"
+			*						P. Townshend
+			*
+			*	Given an array full of triples (v), this function will number them
+			*	on screen giving a powerful debugging tool for creating geometry.
+			*/
+			function NumberVertices(mvp, v, ctx) {
+				let num_vertices = v.length / 3;
+				for (let vertex_index = 0; vertex_index < num_vertices; vertex_index++) {
+					let offset = vertex_index * 3;
+					let p = vec4.fromValues(v[offset], v[offset + 1], v[offset + 2], 1);
+					ProjectText(p, mvp, ctx, String(vertex_index));
+				}
+			}
+
+			/*	ProjectText()
+			*	
+			*	Given a point in modeling coordinates and an MVP, compute the screen space
+			*	coordinate where that point will be after  projection through  the viewing
+			*	pipeline. 'p' is produced in "normalized device coordinates" which must be
+			*	converted to window coordinates by the method computing 'c'.
+			*/
+			function ProjectText(P, mvp, ctx, text) {
+				let p = vec4.clone(P);
+				vec4.transformMat4(p, p, mvp);
+				p[0] /= p[3];
+				p[1] /= p[3];
+				let c = vec2.fromValues((p[0] * 0.5 + 0.5) * gl.canvas.width, (p[1] * -0.5 + 0.5) * gl.canvas.height);
+				ctx.fillText(text, c[0], c[1]);
+			}
+
+			/*	Global variables must be declared outside of a function.
+			*/
+
+			var vec3 = glMatrix.vec3;
+			var mat4 = glMatrix.mat4;
+			var vec4 = glMatrix.vec4;
+			var vec2 = glMatrix.vec2;
+
+			var x_axis = vec3.fromValues(1, 0, 0);
+			var y_axis = vec3.fromValues(0, 1, 0);
+			var z_axis = vec3.fromValues(0, 0, 1);
+			var near_plane = 1;
+			var far_plane = 15;
+
+			var glcanvas = document.getElementById('glcanvas');
+			var txcanvas = document.getElementById("txcanvas");
+			// This getContext call with ask for webgl2 to enable automatic antialiasing.
+			// Safari, for example,  does not support it  because Apple. Firefox does. Be
+			// like Firefox.
+			var gl = glcanvas.getContext('webgl2', { antialias: true });
+			var ct = txcanvas.getContext("2d");
+			var color_shader = {};
+			var solid_shader = {};
+			var phong_shader = {};
+			var wireframe = false;
+			var number_vertices = false;
+			var display_normals = false;
+			var draw_solid = false;
+
+			InitCT();
+			InitializeIndexedColorShader();
+			InitializeSolidColorShader();
+            InitializePhongShader();
+            
+            var oc = [0.0, 0.0, 0.0];
+            var ic = [0.0, 0.0, 1.0];
+
+            var drawTheta = 180.0;
+            slices, stacks, outer_radius, inner_radius, outer_center, inner_center, theta
+			var disc = new Disc(7, 2, 2.0, .5, oc, ic, drawTheta, solid_shader);
+			/*	These must come after shaders have been initialized.
+			*/ 
+
+			document.addEventListener('keydown', function(event) {
+				if (event.key == 'w') {
+					wireframe = !wireframe;
+				}
+				else if (event.key == 'v') {
+					number_vertices = !number_vertices;
+				}
+				else if (event.key == 'n') {
+					display_normals = !display_normals;
+				}
+				else if (event.key == 's') {
+					draw_solid = !draw_solid;
+				}
+			});
+
+			requestAnimationFrame(DrawScene)
+		</script>
+	</body>
+</html>
