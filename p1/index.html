@@ -50,21 +50,57 @@
                 //let theta = Radians(now * 2*Math.PI * 15/60 * 60 * 38/40);
                 //the speed is now (s) * 2pi (rad) / 4 (s)
                 let theta = now * Math.PI / 2;
-                console.log(now);
+                //console.log(now);
 				mat4.rotate(M, M, theta, y_axis);
 				mat4.multiply(MVP, V, M);
 				mat4.multiply(MVP, P, MVP);
 				// M, V, and P are not longer being passed down separately but are precompounded here.
-				// More exotic shaders will need the individual matrices again in the future. 
-				disc.Draw(['wireframe'], MVP, [1, 1, 1, 1]);
-				if (display_normals)
-					disc.DrawNormals(MVP, [1, 0.15, 0.15, 1]);
-				if (number_vertices)
-					NumberVertices(MVP, disc.vrts, ct);
-				if (draw_solid)
-					disc.DrawSolid(MVP, [0.2, 0.4, 0.9, 1]);
+                // More exotic shaders will need the individual matrices again in the future. 
 
-				requestAnimationFrame(DrawScene);
+                //for variable amounts of objects, make a DISC[] and just shove things in there
+                switch(currentShape){
+                    case 0:
+                        disc.Draw(['wireframe'], MVP, [1, 1, 1, 1]);
+                        if (display_normals)
+                            disc.DrawNormals(MVP, [1, 0.15, 0.15, 1]);
+                        if (number_vertices)
+                            NumberVertices(MVP, disc.vrts, ct);
+                        if (draw_solid)
+                            disc.DrawSolid(MVP, [0.2, 0.4, 0.9, 1]);
+                        requestAnimationFrame(DrawScene);
+                        break;
+                    case 1:
+                        ring.Draw(['wireframe'], MVP, [1, 1, 1, 1]);
+                        if (display_normals)
+                            ring.DrawNormals(MVP, [1, 0.15, 0.15, 1]);
+                        if (number_vertices)
+                            NumberVertices(MVP, ring.vrts, ct);
+                        if (draw_solid)
+                            ring.DrawSolid(MVP, [0.2, 0.4, 0.9, 1]);
+                        requestAnimationFrame(DrawScene);
+                        break;
+                    case 2:
+                        cylinder.Draw(['wireframe'], MVP, [1, 1, 1, 1]);
+                        if (display_normals)
+                            cylinder.DrawNormals(MVP, [1, 0.15, 0.15, 1]);
+                        if (number_vertices)
+                            NumberVertices(MVP, cylinder.vrts, ct);
+                        if (draw_solid)
+                            cylinder.DrawSolid(MVP, [0.2, 0.4, 0.9, 1]);
+                        requestAnimationFrame(DrawScene);
+                        break;
+                    case 3:
+                        partialcone.Draw(['wireframe'], MVP, [1, 1, 1, 1]);
+                        if (display_normals)
+                            partialcone.DrawNormals(MVP, [1, 0.15, 0.15, 1]);
+                        if (number_vertices)
+                            NumberVertices(MVP, partialcone.vrts, ct);
+                        if (draw_solid)
+                            partialcone.DrawSolid(MVP, [0.2, 0.4, 0.9, 1]);
+                        requestAnimationFrame(DrawScene);
+                        break;
+                }
+
 			}
 
 			function InitCT() {
@@ -143,13 +179,19 @@
             InitializePhongShader();
             
             var oc = [0.0, 0.0, 0.0];
-            var ic = [0.0, 0.0, 1.0];
+            var ic = [0.0, 0.0, 0.0];
 
-            var drawTheta = 180.0;
-            slices, stacks, outer_radius, inner_radius, outer_center, inner_center, theta
-			var disc = new Disc(7, 2, 2.0, .5, oc, ic, drawTheta, solid_shader);
+            var drawTheta = 360.0;
+            //slices, stacks, outer_radius, inner_radius, outer_center, inner_center, theta
+            var disc = new Disc(16, 4, 1.0, .05, oc, ic, drawTheta, solid_shader);
+            var ring = new Disc(16, 4, 1.0, .5, oc, ic, drawTheta, solid_shader);
+            ic = [0.0,0.0,2.0];
+            var cylinder = new Disc(16, 4, 1.0, 1.0, oc, ic, drawTheta, solid_shader);
+            drawTheta = 270.0;
+            var partialcone = new Disc(16,4,1.0,.05, oc, ic, drawTheta, solid_shader);
 			/*	These must come after shaders have been initialized.
-			*/ 
+            */ 
+            var currentShape = 0;
 
 			document.addEventListener('keydown', function(event) {
 				if (event.key == 'w') {
@@ -163,7 +205,10 @@
 				}
 				else if (event.key == 's') {
 					draw_solid = !draw_solid;
-				}
+                }
+                else if(event.key == 'm'){
+                    currentShape = (currentShape +1)%4;
+                }
 			});
 
 			requestAnimationFrame(DrawScene)

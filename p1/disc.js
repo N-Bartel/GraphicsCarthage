@@ -82,25 +82,30 @@ class Disc  {
 		// radius. This sets the magnitude of a vector along the x axis 
 		// which will be rotated around a circle to produce each ring.
 		for (let stk = 0; stk < stacks + 1; stk++) {
-			let u = stk / stacks;
-			let x = [this.LERP(ir, or, inner_to_outer), 0, 0];
+            let u = stk / stacks;
+            let zoffset = this.LERP(ic[2],oc[2],inner_to_outer);
+            let x = [this.LERP(ir, or, inner_to_outer), 0.0, zoffset];
 			let r = mat4.create();
 
 			for (var slc = 0; slc < slices; slc++) {
 				var v = slc / slices;
 				//console.log(slc + ' ' + v);
-				vec3.transformMat4(p, x, r);
+                vec3.transformMat4(p, x, r);
+                p[0] += this.LERP(ic[0],oc[0], inner_to_outer);
+                p[1] += this.LERP(ic[1],oc[1],inner_to_outer);
 				this.PushVertex(this.vrts, p);
 				// Every vertex gets a normal which is initially along the z-axis.
 				// If the geometry changes over time, normals at each vertex must
-				// be recomputed and reloaded.
+                // be recomputed and reloaded.
+                // This issue will be patched at a later date (project 2);
 				this.PushVertex(this.nrml, z_axis);
 				// Reminder, texture coordinates are computed but not yet otherwise used.
 				this.PushVertex(this.txtc, [u, v]);
 				mat4.rotate(r, r, incr_theta, z_axis);
-			}
+            }
 			inner_to_outer += incr_stack;
-		}
+        }
+        
 
 		// This loop assembles an array containing the indices of each triangle's vertex.
 		// This data could be used directly for a call to 'drawElements' but it is also
@@ -256,7 +261,7 @@ class Disc  {
 	* @param {float} 	when t is zero, return this.
 	* @param {float}	when t is one, return this.
 	* @param {float}	t - between 0 and 1 inclusive.
-	* @return {float}	the interpolated value between a and b inclusive.
+    * @return {float}	the interpolated value between a and b inclusive.
 	*/
 	LERP(a, b, t)
 	{
