@@ -4,7 +4,8 @@
 	</head>
 	<body style="background-color: #404040;">
 		<!--	Fairly minimalist demonstration of the roles of M, V and P.
-				Perry Kivolowitz - Carthage College Computer Science Department
+				Changes made by Nick Bartel and Adam Biewer for project 1
+				Adapted from Perry Kivolowitz - Carthage College Computer Science Department
 		-->
 		<script src="./gl-matrix-min.js"></script>
 		<script src="./shader_sources.js"></script>
@@ -44,20 +45,18 @@
 				let MVP = mat4.create();
 
 				mat4.perspective(P, Radians(40.0), glcanvas.clientWidth / glcanvas.clientHeight, near_plane, far_plane);
-				mat4.lookAt(V, vec3.fromValues(5, 5, 5), vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
-				// NOTE: This is NOT 15 RPM - you still have to figure that out.-
-                //let theta = Radians(now * 1.5707963249999999 * 60 * 38/40);
-                //let theta = Radians(now * 2*Math.PI * 15/60 * 60 * 38/40);
+				mat4.lookAt(V, vec3.fromValues(5, 5, 10), vec3.fromValues(0, 0, 0), vec3.fromValues(0, 1, 0));
+
                 //the speed is now (s) * 2pi (rad) / 4 (s)
                 let theta = now * Math.PI / 2;
-                //console.log(now);
+
 				mat4.rotate(M, M, theta, y_axis);
 				mat4.multiply(MVP, V, M);
 				mat4.multiply(MVP, P, MVP);
 				// M, V, and P are not longer being passed down separately but are precompounded here.
                 // More exotic shaders will need the individual matrices again in the future. 
 
-                //for variable amounts of objects, make a DISC[] and just shove things in there
+                //to make the code better for variable amounts of objects, make a DISC[] and just shove things in there
                 switch(currentShape){
                     case 0:
                         disc.Draw(['wireframe'], MVP, [1, 1, 1, 1]);
