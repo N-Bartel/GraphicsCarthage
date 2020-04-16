@@ -1,6 +1,6 @@
 <html>
 	<head>
-		<title>My first three.js app</title>
+		<title>SmashBros 3D</title>
 		<style>
 			body { margin: 0; }
 			canvas { display: block; }
@@ -8,18 +8,34 @@
 	</head>
 	<body>
 		<script src="./three.js-master/build/three.js"></script>
+		<script src="./build/oimo.min.js"></script>
 		<script>
 			var scene = new THREE.Scene();
 			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 
-			var renderer = new THREE.WebGLRenderer();
-			renderer.setSize( window.innerWidth, window.innerHeight );
-			document.body.appendChild( renderer.domElement );
+			renderer = new THREE.WebGLRenderer( { antialias: true } );
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    
+    document.body.appendChild(renderer.domElement);
+    document.body.addEventListener( 'keydown', onKeyDown, false );
 
 			var geometry = new THREE.BoxGeometry();
 			var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
 			var cube = new THREE.Mesh( geometry, material );
 			scene.add( cube );
+
+			///
+			//var battleGroundgeometry = new THREE.BoxGeometry();
+			//var battleGroundmaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+			//var battleGround = new THREE.Mesh(battleGroundgeometry, battleGroundmaterial );
+			//scene.add( battleGround );
+
+			var geometry = new THREE.PlaneGeometry( 5, 20, 32 );
+			var material = new THREE.MeshBasicMaterial( {color: 0xD3D3D3, side: THREE.DoubleSide} );
+			var plane = new THREE.Mesh( geometry, material );
+			scene.add( plane );
+			plane.position.set(0,0,0);
+			plane.rotation.x += 90;
 
 			camera.position.z = 5;
 
@@ -32,6 +48,23 @@
 				renderer.render( scene, camera );
 			};
 
+			function onKeyDown(){
+			switch( event.keyCode ) {
+			case 83: // up
+			camera.position.z += 5;
+			break;
+			case 87: // down
+			camera.position.z -= 5;
+			break;
+			case 65: // up
+			camera.position.x += 5;
+			break;
+			case 68: // down
+			camera.position.x -= 5;
+			break;
+			}
+			
+		}
 			animate();
 		</script>
 	</body>
