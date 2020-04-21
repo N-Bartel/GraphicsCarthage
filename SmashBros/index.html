@@ -30,37 +30,58 @@
 			//var battleGround = new THREE.Mesh(battleGroundgeometry, battleGroundmaterial );
 			//scene.add( battleGround );
 
-			var geometry = new THREE.PlaneGeometry( 5, 20, 32 );
-			var material = new THREE.MeshBasicMaterial( {color: 0xD3D3D3, side: THREE.DoubleSide} );
+			var texture = new THREE.TextureLoader().load( 'Ocean.png' );
+			var geometry = new THREE.BoxGeometry( 20, .1, 32 );
+			var material = new THREE.MeshBasicMaterial( {map: texture, side: THREE.DoubleSide} );
 			var plane = new THREE.Mesh( geometry, material );
 			scene.add( plane );
 			plane.position.set(0,0,0);
-			plane.rotation.x += 90;
+			//plane.rotation.x += 90;
+
+			var light = new THREE.PointLight( 0xff0000, 1, 100 );
+			light.position.set( 1, 1, 1 );
+			scene.add( light );
+
 
 			camera.position.z = 5;
 
 			var animate = function () {
 				requestAnimationFrame( animate );
 
-				cube.rotation.x += 0.01;
-				cube.rotation.y += 0.01;
+				//cube.rotation.x += 0.01;
+				//cube.rotation.y += 0.01;
 
 				renderer.render( scene, camera );
 			};
-
+	
 			function onKeyDown(){
 			switch( event.keyCode ) {
 			case 83: // up
-			camera.position.z += 5;
+			cube.position.z += 1;
+			//cube.position.x += Math.sin(Math.PI/10);
 			break;
 			case 87: // down
-			camera.position.z -= 5;
+			cube.position.z -= 1;
 			break;
 			case 65: // up
-			camera.position.x += 5;
+			cube.position.x -= 1;
 			break;
 			case 68: // down
-			camera.position.x -= 5;
+			cube.position.x += 1;
+			break;
+
+			//camera code
+			case 38: // up
+			camera.position.y +=1;
+			break;
+			case 40: // down
+			camera.position.y -=1;
+			break;
+			case 37: // left
+			camera.position.x -= 1;
+			break;
+			case 39: // right
+			camera.position.x += 1;
 			break;
 			}
 			
