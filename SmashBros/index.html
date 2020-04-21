@@ -1,92 +1,110 @@
 <html>
-	<head>
-		<title>SmashBros 3D</title>
-		<style>
-			body { margin: 0; }
-			canvas { display: block; }
-		</style>
-	</head>
-	<body>
-		<script src="./three.js-master/build/three.js"></script>
-		<script src="./build/oimo.min.js"></script>
-		<script>
-			var scene = new THREE.Scene();
-			var camera = new THREE.PerspectiveCamera( 75, window.innerWidth/window.innerHeight, 0.1, 1000 );
 
-			renderer = new THREE.WebGLRenderer( { antialias: true } );
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    
-    document.body.appendChild(renderer.domElement);
-    document.body.addEventListener( 'keydown', onKeyDown, false );
-
-			var geometry = new THREE.BoxGeometry();
-			var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
-			var cube = new THREE.Mesh( geometry, material );
-			scene.add( cube );
-
-			///
-			//var battleGroundgeometry = new THREE.BoxGeometry();
-			//var battleGroundmaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
-			//var battleGround = new THREE.Mesh(battleGroundgeometry, battleGroundmaterial );
-			//scene.add( battleGround );
-
-			var texture = new THREE.TextureLoader().load( 'Ocean.png' );
-			var geometry = new THREE.BoxGeometry( 20, .1, 32 );
-			var material = new THREE.MeshBasicMaterial( {map: texture, side: THREE.DoubleSide} );
-			var plane = new THREE.Mesh( geometry, material );
-			scene.add( plane );
-			plane.position.set(0,0,0);
-			//plane.rotation.x += 90;
-
-			var light = new THREE.PointLight( 0xff0000, 1, 100 );
-			light.position.set( 1, 1, 1 );
-			scene.add( light );
-
-
-			camera.position.z = 5;
-
-			var animate = function () {
-				requestAnimationFrame( animate );
-
-				//cube.rotation.x += 0.01;
-				//cube.rotation.y += 0.01;
-
-				renderer.render( scene, camera );
-			};
-	
-			function onKeyDown(){
-			switch( event.keyCode ) {
-			case 83: // up
-			cube.position.z += 1;
-			//cube.position.x += Math.sin(Math.PI/10);
-			break;
-			case 87: // down
-			cube.position.z -= 1;
-			break;
-			case 65: // up
-			cube.position.x -= 1;
-			break;
-			case 68: // down
-			cube.position.x += 1;
-			break;
-
-			//camera code
-			case 38: // up
-			camera.position.y +=1;
-			break;
-			case 40: // down
-			camera.position.y -=1;
-			break;
-			case 37: // left
-			camera.position.x -= 1;
-			break;
-			case 39: // right
-			camera.position.x += 1;
-			break;
-			}
-			
+<head>
+	<title>SmashBros 3D</title>
+	<style>
+		body {
+			margin: 0;
 		}
-			animate();
-		</script>
-	</body>
+
+		canvas {
+			display: block;
+		}
+
+		#c {
+			width: 100vw;
+			height: 100vh;
+			display: block;
+			background: url(skybox.png) no-repeat center center;
+			background-size: cover;
+		}
+	</style>
+</head>
+
+<body>
+	<script src="./three.js-master/build/three.js"></script>
+	<script src="./build/oimo.min.js"></script>
+	<canvas id="c"></canvas>
+	<script>
+		var scene = new THREE.Scene();
+		var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+		const canvas = document.querySelector('#c');
+		renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+		renderer.setSize(window.innerWidth, window.innerHeight);
+
+		document.body.appendChild(renderer.domElement);
+		document.body.addEventListener('keydown', onKeyDown, false);
+
+		var geometry = new THREE.BoxGeometry();
+		var material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+		var cube = new THREE.Mesh(geometry, material);
+		scene.add(cube);
+
+		///
+		//var battleGroundgeometry = new THREE.BoxGeometry();
+		//var battleGroundmaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
+		//var battleGround = new THREE.Mesh(battleGroundgeometry, battleGroundmaterial );
+		//scene.add( battleGround );
+
+		var texture = new THREE.TextureLoader().load('Ocean.png');
+		var geometry = new THREE.BoxGeometry(20, .1, 32);
+		var material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
+		var plane = new THREE.Mesh(geometry, material);
+		scene.add(plane);
+		plane.position.set(0, 0, 0);
+		//plane.rotation.x += 90;
+
+		var light = new THREE.PointLight(0xff0000, 1, 100);
+		light.position.set(1, 1, 1);
+		scene.add(light);
+
+
+		camera.position.z = 5;
+
+		var animate = function () {
+			requestAnimationFrame(animate);
+
+			//cube.rotation.x += 0.01;
+			//cube.rotation.y += 0.01;
+
+			renderer.render(scene, camera);
+		};
+
+		function onKeyDown() {
+			switch (event.keyCode) {
+				case 83: // up
+					cube.position.z += 1;
+					//cube.position.x += Math.sin(Math.PI/10);
+					break;
+				case 87: // down
+					cube.position.z -= 1;
+					break;
+				case 65: // up
+					cube.position.x -= 1;
+					break;
+				case 68: // down
+					cube.position.x += 1;
+					break;
+
+				//camera code
+				case 38: // up
+					camera.position.y += 1;
+					break;
+				case 40: // down
+					camera.position.y -= 1;
+					break;
+				case 37: // left
+					camera.position.x -= 1;
+					break;
+				case 39: // right
+					camera.position.x += 1;
+					break;
+			}
+
+		}
+		animate();
+	</script>
+</body>
+
 </html>
