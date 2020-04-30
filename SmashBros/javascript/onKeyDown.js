@@ -8,10 +8,10 @@ function onKeyDown() {
 			backward = true;
 			break;
 		case 65: // up
-			leftward = true;
+			rightward = true;
 			break;
 		case 68: // down
-			rightward = true;
+			leftward = true;
 			break;
 
 		//camera code
@@ -39,10 +39,10 @@ function onKeyUp() {
 			backward = false;
 			break;
 		case 65: // a
-			leftward = false;
+			rightward = false;
 			break;
 		case 68: // d
-			rightward = false;
+			leftward = false;
 			break;
 
 

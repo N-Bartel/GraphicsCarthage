@@ -34,7 +34,7 @@ var body = world.add({
 	rot: [0, 0, 90], // start rotation in degree
 	move: true, // dynamic or statique
 	density: 1,
-	friction: 0.2,
+	friction: 1,
 	restitution: 0.2,
 	belongsTo: 1, // The bits of the collision groups to which the shape belongs.
 	collidesWith: 0xffffffff // The bits of the collision groups with which the shape collides.
@@ -91,16 +91,21 @@ var animate = function () {
 animate();
 
 function updateCharacter(){
+	var vx = 0;
+	var vz = 0;
 	if(forward){
-		body.velocity.z = .4;
+		vz += 6;
 	}
 	if(backward){
-		body.velocity.z = -.4;
+		vz += -6;
 	}
 	if(leftward){
-		body.velocity.x = .4;
+		vx += 6;
 	}
 	if(rightward){
-		body.velocity.x = -.4;
+		vx += -6;
 	}
+
+	body.linearVelocity.z = vz;
+	body.linearVelocity.x = vx;
 }
