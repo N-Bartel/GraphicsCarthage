@@ -92,15 +92,15 @@ animate();
 
 function updateCharacter(){
 	if(forward){
-		body.setLinearVelocity({x:0,y:0,z:.1});
+		body.velocity.z = .4;
 	}
 	if(backward){
-		body.setLinearVelocity({x:0,y:0,z:-.1});
+		body.velocity.z = -.4;
 	}
 	if(leftward){
-		body.setLinearVelocity({x:-.1,y:0,z:0});
+		body.velocity.x = .4;
 	}
 	if(rightward){
-		body.setLinearVelocity({x:.1,y:0,z:0});
+		body.velocity.x = -.4;
 	}
 }
