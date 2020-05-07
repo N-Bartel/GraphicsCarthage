@@ -1,3 +1,7 @@
+
+var currentPosX = 0;
+var currentPosY = 1;
+
 var scene = new THREE.Scene();
 var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -40,6 +44,19 @@ var body = world.add({
 	collidesWith: 0xffffffff // The bits of the collision groups with which the shape collides.
 });
 
+var enemyO = world.add({
+	type: 'box', // type of shape : sphere, box, cylinder 
+	size: [1, 1, 1], // size of shape
+	pos: [0, .1, -10], // start position in degree
+	rot: [0, 0, 90], // start rotation in degree
+	move: true, // dynamic or statique
+	density: 1,
+	friction: 1,
+	restitution: 0.2,
+	belongsTo: 1, // The bits of the collision groups to which the shape belongs.
+	collidesWith: 0xffffffff // The bits of the collision groups with which the shape collides.
+});
+
 var battleGround = world.add({
 	type: 'box',
 	size: [20, .1, 32],
@@ -52,6 +69,12 @@ var battleGround = world.add({
 	belongsTo: 1
 });
 
+
+
+var geometry = new THREE.BoxGeometry();
+var material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+var enemy = new THREE.Mesh(geometry, material);
+scene.add(enemy);
 ///
 //var battleGroundgeometry = new THREE.BoxGeometry();
 //var battleGroundmaterial = new THREE.MeshBasicMaterial( { color: 0xff0000 } );
@@ -71,8 +94,11 @@ light.position.set(1, 1, 1);
 scene.add(light);
 
 
-camera.position.z = 5;
-camera.position.y = 1;
+camera.position.z = 3;
+camera.position.y = 3;
+
+camera.lookAt(cube.position);
+
 
 var animate = function () {
 	requestAnimationFrame(animate);
@@ -83,8 +109,15 @@ var animate = function () {
 	cube.position.copy(body.getPosition());
 	cube.quaternion.copy(body.getQuaternion());
 
-	updateCharacter();
+	
+enemy.position.copy(enemyO.getPosition());
+enemy.quaternion.copy(enemyO.getQuaternion());
 
+
+	updateCharacter();
+	ai();
+	//camera.position.z = cube.position.z + 3;
+	camera.lookAt(cube.position);
 	renderer.render(scene, camera);
 };
 
@@ -108,4 +141,28 @@ function updateCharacter(){
 
 	body.linearVelocity.z = vz;
 	body.linearVelocity.x = vx;
+}
+
+function ai()
+{
+	var attackZ = enemy.position.z - cube.position.z;
+	var attackX = enemy.position.x - cube.position.x;
+
+	if ( attackZ < 0)
+	{
+		enemyO.linearVelocity.z +=6;
+	}
+	else
+	{
+		enemyO.linearVelocity.z -=6;
+	}
+
+	if ( attackX < 0)
+	{
+		enemyO.linearVelocity.x +=6;
+	}
+	else
+	{
+		enemyO.linearVelocity.x -=6;
+	}
 }
