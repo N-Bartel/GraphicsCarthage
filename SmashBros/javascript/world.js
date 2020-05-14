@@ -59,7 +59,7 @@ var body = world.add({
 var enemyO = world.add({
 	type: 'box', // type of shape : sphere, box, cylinder 
 	size: [1, 1, 1], // size of shape
-	pos: [0, .1, -10], // start position in degree
+	pos: [0, 1.1, -10], // start position in degree
 	rot: [0, 0, 90], // start rotation in degree
 	move: true, // dynamic or statique
 	density: 1,
@@ -209,15 +209,24 @@ function updateCharacter(){
 
 	body.linearVelocity.z = vz;
 	body.linearVelocity.x = vx;
+
+	if(body.position.y<-1)
+	{
+		body.position.x = 0;
+		body.position.y = 1;
+		body.position.z = 0;
+	}
 }
 
 function ai()
 {
 	var attackZ = enemy.position.z - cube.position.z;
 	var attackX = enemy.position.x - cube.position.x;
-	if (enemy.position.y < -4)
+	if (enemyO.position.y < -4)
 	{
-		enemy.position = cube.position;
+		enemyO.position.x = 0;
+		enemyO.position.y = 1;
+		enemyO.position.z = 2;
 	}
 
 	if ( attackZ < 0)
