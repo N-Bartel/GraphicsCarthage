@@ -69,6 +69,19 @@ var enemyO = world.add({
 	collidesWith: 0xffffffff // The bits of the collision groups with which the shape collides.
 });
 
+var billboard = world.add({
+	type: 'box', // type of shape : sphere, box, cylinder 
+	size: [30, 30, 1], // size of shape
+	pos: [14, 5, -18], // start position in degree
+	rot: [0, 0, 90], // start rotation in degree
+	move: false, // dynamic or statique
+	density: 1,
+	friction: 1,
+	restitution: 0.2,
+	belongsTo: 1, // The bits of the collision groups to which the shape belongs.
+	collidesWith: 0xffffffff // The bits of the collision groups with which the shape collides.
+});
+
 var battleGround = world.add({
 	type: 'box',
 	size: [5, .1, 25],
@@ -162,7 +175,7 @@ var geometry = new THREE.BoxGeometry(30, 10, 1);
 var material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
 var plane = new THREE.Mesh(geometry, material);
 scene.add(plane);
-plane.position.set(15,5, -20);
+plane.position.copy(billboard.getPosition());
 
 
 //--------------------------------------------------------------------------
@@ -192,19 +205,19 @@ enemy.quaternion.copy(enemyO.getQuaternion());
 animate();
 
 function updateCharacter(){
-	var vx = 0;
-	var vz = 0;
-	if(forward){
-		vz += 6;
+	var vx = body.linearVelocity.x;
+	var vz = body.linearVelocity.z;
+	if(forward && vz < 5){
+		vz += .5;
 	}
-	if(backward){
-		vz += -6;
+	if(backward && vz > -5){
+		vz += -.5;
 	}
-	if(leftward){
-		vx += 6;
+	if(leftward && vx < 5){
+		vx += .5;
 	}
-	if(rightward){
-		vx += -6;
+	if(rightward && vx > -5){
+		vx += -.5;
 	}
 
 	body.linearVelocity.z = vz;
@@ -215,6 +228,9 @@ function updateCharacter(){
 		body.position.x = 0;
 		body.position.y = 1;
 		body.position.z = 0;
+		body.linearVelocity.z = 0;
+		body.linearVelocity.x = 0;
+		body.linearVelocity.y = 0;
 	}
 }
 
@@ -224,26 +240,31 @@ function ai()
 	var attackX = enemy.position.x - cube.position.x;
 	if (enemyO.position.y < -4)
 	{
-		enemyO.position.x = 0;
-		enemyO.position.y = 1;
-		enemyO.position.z = 2;
+		enemyO.position.x = body.position.x;
+		enemyO.position.y = body.position.y + 5;
+		enemyO.position.z = body.position.z;
+		enemy0.linearVelocity.x = 0;
+		enemy0.linearVelocity.y = 0;
+		enemy0.linearVelocity.z = 0;
 	}
 
-	if ( attackZ < 0)
+	if(attackZ<0)
 	{
-		enemyO.linearVelocity.z +=6;
+		attackZ-=.5;
 	}
-	else
-	{
-		enemyO.linearVelocity.z -=6;
+	else{
+		attackZ += .5;
 	}
 
-	if ( attackX < 0)
+	if(attackX<0)
 	{
-		enemyO.linearVelocity.x +=6;
+		attackX -= .5;
 	}
-	else
-	{
-		enemyO.linearVelocity.x -=6;
+	else{
+		attackX += .5;
 	}
+
+	enemyO.linearVelocity.z -=(attackZ/8);
+
+	enemyO.linearVelocity.x -=attackX/8;
 }
